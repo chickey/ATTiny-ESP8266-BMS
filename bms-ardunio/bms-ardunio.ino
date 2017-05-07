@@ -2,8 +2,8 @@
 #include <ESP8266WiFi.h>
 
 // Configure SSID and password of Wifi Network
-const char* ssid = "chickey-house";
-const char* password = "adamjoeollie";
+const char* ssid = "Place SSID here";
+const char* password = "Place password here";
 
 // Web Server on port 80
 WiFiServer server(80);
@@ -12,7 +12,7 @@ WiFiServer server(80);
 
 const int Cell1 = D2;
 const int Cell2 = D3;
-const int Cell3 = D4;
+const int Cell3 = D1;
 const int Cell4 = D5;
 const int Cell5 = D6;
 const int Cell6 = D7;
@@ -28,7 +28,7 @@ boolean CellON6 = false;
 boolean CellON7 = false;
 
 //Common variable declarations for converting pwm to mV
-int CellV;
+int CellV[7];
 unsigned long z;
 unsigned long y;
 unsigned long x;
@@ -44,6 +44,7 @@ const int throttleCut = 9;
 //Manual Variables
 int LVW = 3600;  //Warning mV
 int LVC = 3400;  //Cutoff mV
+int batteryCellCount = 0;  //variable to add up active Cells
 
 void setup() {
 
@@ -96,7 +97,7 @@ int CellCheck7 = pulseIn(Cell7, HIGH, 100000);
 
 Serial.printf("Detecting active Cells: ");
 
-int batteryCellCount = 0;  //variable to add up active Cells
+
 
 //Toggle active Cells ON and print out
 if(CellCheck1 > 1){
@@ -111,7 +112,7 @@ if(CellCheck2 > 1){
 }
 if(CellCheck3 > 1){
     CellON3 = true;
-    //Serial.print("3");
+    Serial.print("3");
     batteryCellCount++;
 }
 if(CellCheck4 > 1){
@@ -121,17 +122,17 @@ if(CellCheck4 > 1){
 }
 if(CellCheck5 > 1){
     CellON5 = true;
-    //Serial.print("5");
+    Serial.print("5");
     batteryCellCount++;
 }
 if(CellCheck6 > 1){
     CellON6 = true;
-    //Serial.print("6");
+    Serial.print("6");
     batteryCellCount++;
 }
 if(CellCheck7 > 1){
     CellON7 = true;
-    //Serial.print("7");
+   Serial.print("7");
     batteryCellCount++;
 }
 delay(100);
@@ -147,68 +148,52 @@ void loop()
   if(CellON1 == true){
       y = pulseIn(Cell1, HIGH, 100000);
       z = pulseIn(Cell1, LOW, 100000);
-//      Serial.print("z pulse = ");
-//      Serial.println(z);
-//      Serial.print("y pulse = ");
-//      Serial.println(y);
-      CellV = pwmConvert(z, y);
-      throttleTend(CellV);
-//      Serial.print("1: ");
-//      Serial.println(CellV);
+         
+      CellV[0] = pwmConvert(z, y);
+      throttleTend(CellV[0]);
   }
   if(CellON2 == true){
-      z = pulseIn(Cell2, HIGH, 100000);
-      y = pulseIn(Cell2, LOW, 100000);
-
-      CellV = pwmConvert(z, y);
-      throttleTend(CellV);
-      Serial.print(" 2: ");
-      Serial.print(CellV);
+      y = pulseIn(Cell2, HIGH, 100000);
+      z = pulseIn(Cell2, LOW, 100000);
+      
+      CellV[1] = pwmConvert(z, y);
+      throttleTend(CellV[1]);
   }
   if(CellON3 == true){
-      z = pulseIn(Cell3, HIGH, 100000);
-      y = pulseIn(Cell3, LOW, 100000);
-
-      CellV = pwmConvert(z, y);
-      throttleTend(CellV);
-      Serial.print("3: ");
-      Serial.print(CellV);
+      y = pulseIn(Cell3, HIGH, 100000);
+      z = pulseIn(Cell3, LOW, 100000);
+      
+      CellV[1]=2;
+      CellV[2] = pwmConvert(z, y);
+      throttleTend(CellV[2]);
   }
   if(CellON4 == true){
-      z = pulseIn(Cell4, HIGH, 100000);
-      y = pulseIn(Cell4, LOW, 100000);
+      y = pulseIn(Cell4, HIGH, 100000);
+      z = pulseIn(Cell4, LOW, 100000);
 
-      CellV = pwmConvert(z, y);
-      throttleTend(CellV);
-      Serial.print("4: ");
-      Serial.print(CellV);
+      CellV[3] = pwmConvert(z, y);
+      throttleTend(CellV[3]);
   }
   if(CellON5 == true){
-      z = pulseIn(Cell5, HIGH, 100000);
-      y = pulseIn(Cell5, LOW, 100000);
+      y = pulseIn(Cell5, HIGH, 100000);
+      z = pulseIn(Cell5, LOW, 100000);
 
-      CellV = pwmConvert(z, y);
-      throttleTend(CellV);
-      Serial.print("5: ");
-      Serial.print(CellV);
+      CellV[4] = pwmConvert(z, y);
+      throttleTend(CellV[4]);
   }
   if(CellON6 == true){
-      z = pulseIn(Cell6, HIGH, 100000);
-      y = pulseIn(Cell6, LOW, 100000);
+      y = pulseIn(Cell6, HIGH, 100000);
+      z = pulseIn(Cell6, LOW, 100000);
 
-      CellV = pwmConvert(z, y);
-      throttleTend(CellV);
-      Serial.print("6: ");
-      Serial.print(CellV);
+      CellV[5] = pwmConvert(z, y);
+      throttleTend(CellV[5]);
   }
   if(CellON7 == true){
-      z = pulseIn(Cell7, HIGH, 100000);
-      y = pulseIn(Cell7, LOW, 100000);
+      y = pulseIn(Cell7, HIGH, 100000);
+      z = pulseIn(Cell7, LOW, 100000);
 
-      CellV = pwmConvert(z, y);
-      throttleTend(CellV);
-      Serial.print("7: ");
-      Serial.print(CellV);
+      CellV[6] = pwmConvert(z, y);
+      throttleTend(CellV[6]);
   }
 
   //Serial.println(""); //End row print
@@ -231,9 +216,15 @@ void loop()
             // your actual web page that displays temperature
             client.println("<!DOCTYPE HTML>");
             client.println("<html>");
-            client.println("<head></head><body><h1>Battery Monitor</h1><h3>Battery 1: ");
-            client.println(CellV);
-            client.println("mV</h3></body></html>");  
+            client.println("<head></head><body><h1>Battery Monitor</h1><h3>");
+
+            for (int battvoltages = 0; battvoltages < batteryCellCount; battvoltages++) {
+              client.println("Battery ");
+              client.println(battvoltages+1);
+              client.println(CellV[battvoltages]);            
+              client.println("mV <br />");
+            }            
+            client.println("</h3></body></html>");  
             break;
         }
         if (c == '\n') {
@@ -293,7 +284,7 @@ void throttleTend(int x)
 int pwmConvert(int z, int y)
 {
   int x = z + y;
-  int v = (int) ( 5000UL * z / x );
+  int v = (int) ( 4975UL * z / x );
   return v;
 }
 
