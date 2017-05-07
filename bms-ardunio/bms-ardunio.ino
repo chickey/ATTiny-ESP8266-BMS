@@ -2,8 +2,8 @@
 #include <ESP8266WiFi.h>
 
 // Configure SSID and password of Wifi Network
-const char* ssid = "Place SSID here";
-const char* password = "Place password here";
+const char* ssid = "chickey-house";
+const char* password = "adamjoeollie";
 
 // Web Server on port 80
 WiFiServer server(80);
@@ -45,6 +45,7 @@ const int throttleCut = 9;
 int LVW = 3600;  //Warning mV
 int LVC = 3400;  //Cutoff mV
 int batteryCellCount = 0;  //variable to add up active Cells
+float totalvolt = 0;
 
 void setup() {
 
@@ -217,14 +218,19 @@ void loop()
             client.println("<!DOCTYPE HTML>");
             client.println("<html>");
             client.println("<head></head><body><h1>Battery Monitor</h1><h3>");
-
+            totalvolt=0;
             for (int battvoltages = 0; battvoltages < batteryCellCount; battvoltages++) {
               client.println("Battery ");
               client.println(battvoltages+1);
               client.println(CellV[battvoltages]);            
               client.println("mV <br />");
+              totalvolt=totalvolt+CellV[battvoltages];
             }            
+            client.println("<br />Total Voltage = ");
+            client.println(totalvolt/1000);
+            client.println("v");
             client.println("</h3></body></html>");  
+           
             break;
         }
         if (c == '\n') {
