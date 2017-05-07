@@ -2,8 +2,8 @@
 #include <ESP8266WiFi.h>
 
 // Configure SSID and password of Wifi Network
-const char* ssid = "chickey-house";
-const char* password = "adamjoeollie";
+const char* ssid = "SSID Details";
+const char* password = "password";
 
 // Web Server on port 80
 WiFiServer server(80);
