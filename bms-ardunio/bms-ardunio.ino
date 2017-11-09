@@ -1,9 +1,17 @@
 #include <Wire.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 
 // Configure SSID and password of Wifi Network
-const char* ssid = "SSID Details";
+const char* ssid = "ssid";
 const char* password = "password";
+
+const char* INFLUXDB_HOST = "192.168.0.129";
+const uint16_t INFLUXDB_PORT = 8086;
+ 
+const char* DATABASE = "powerwall";
+const char* DB_USER = "root";
+const char* DB_PASSWORD = "root";
 
 // Web Server on port 80
 WiFiServer server(80);
@@ -98,8 +106,6 @@ int CellCheck7 = pulseIn(Cell7, HIGH, 100000);
 
 Serial.printf("Detecting active Cells: ");
 
-
-
 //Toggle active Cells ON and print out
 if(CellCheck1 > 1){
     CellON1 = true;
@@ -164,7 +170,6 @@ void loop()
       y = pulseIn(Cell3, HIGH, 100000);
       z = pulseIn(Cell3, LOW, 100000);
       
-      CellV[1]=2;
       CellV[2] = pwmConvert(z, y);
       throttleTend(CellV[2]);
   }
@@ -197,7 +202,19 @@ void loop()
       throttleTend(CellV[6]);
   }
 
-  //Serial.println(""); //End row print
+String data = "http://" + String(INFLUXDB_HOST) + ":" + INFLUXDB_PORT + "/write?db=" + DATABASE ;
+
+for (int battvoltages = 0; battvoltages < batteryCellCount; battvoltages++) {
+    HTTPClient http;
+    http.begin(data);
+    http.addHeader("Content-Type", "data-binary");
+    int httpCode = http.POST("cell-voltages,Cell=" + String(battvoltages+1) +" value="+String(CellV[battvoltages]));
+    String payload = http.getString();
+    Serial.println("cell-voltages,Cell=" + String(battvoltages+1) +" value="+String(CellV[battvoltages]));
+    Serial.println(payload);
+}
+
+//Serial.println(""); //End row print
 // Listenning for new clients
   WiFiClient client = server.available();
   
@@ -271,7 +288,7 @@ void loop()
     digitalWrite(throttleCut, LOW);
   }
 
- delay(1000); //common delay
+ delay(60000); //common delay
   
 }
 
